@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: devops-workshop-app
+  labels:
+    app: devops-workshop-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: devops-workshop-app
+  template:
+    metadata:
+      labels:
+        app: devops-workshop-app
+    spec:
+      containers:
+        - name: devops-workshop-app
+          image: devops-workshop-app:1.0.0
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 5
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
