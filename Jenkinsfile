@@ -12,9 +12,27 @@ pipeline {
             }
         }
 
-        stage('Build & Test') {
+        stage('Compile') {
             steps {
-                sh 'mvn clean test package'
+                sh 'mvn compile'
+            }
+        }
+
+        stage('Checkstyle') {
+            steps {
+                sh 'mvn checkstyle:check'
+            }
+        }
+
+        stage('Unit Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Package') {
+            steps {
+                sh 'mvn package -DskipTests'
             }
         }
     }
