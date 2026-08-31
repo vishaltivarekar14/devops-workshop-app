@@ -162,12 +162,14 @@ pipeline {
                     trivy image \
                         --exit-code 1 \
                         --severity HIGH,CRITICAL \
+                        --ignorefile .trivyignore \
                         --format table \
                         ${APP_NAME}:1.0.${BUILD_NUMBER}
 
                     trivy image \
                         --exit-code 0 \
                         --severity HIGH,CRITICAL \
+                        --ignorefile .trivyignore \
                         --format json \
                         --output trivy-report.json \
                         ${APP_NAME}:1.0.${BUILD_NUMBER}
