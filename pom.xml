@@ -19,6 +19,9 @@
 
     <properties>
         <java.version>21</java.version>
+        <sonar.projectKey>devops-workshop-app</sonar.projectKey>
+        <sonar.projectName>DevOps Workshop App</sonar.projectName>
+        <sonar.host.url>http://sonarqube:9000</sonar.host.url>
     </properties>
 
     <dependencies>
@@ -34,6 +37,13 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+        </dependency>
+
+        <!-- Micrometer: exposes Spring Boot metrics at /actuator/prometheus -->
+        <!-- Prometheus scrapes this endpoint for monitoring -->
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>micrometer-registry-prometheus</artifactId>
         </dependency>
     </dependencies>
 

@@ -11,14 +11,15 @@
  *  This is called "Pipeline as Code."
  *
  *  PIPELINE STAGES (in order):
- *  1. Checkout      — Pull source code from Git
- *  2. Compile       — Compile Java source files
- *  3. Checkstyle    — Enforce coding style rules (DevSecOps gate)
- *  4. Unit Test     — Run JUnit tests and publish results
- *  5. Package       — Build the runnable JAR artifact
- *  6. Docker Build  — Package JAR into a Docker image
- *  7. Snyk Scan     — Scan Docker image for CVEs (DevSecOps gate)
- *  8. Deploy to K8s — Roll out the image to Kubernetes
+ *  1. Checkout          — Pull source code from Git
+ *  2. Compile           — Compile Java source files
+ *  3. Checkstyle        — Enforce coding style rules (DevSecOps gate)
+ *  4. Unit Test         — Run JUnit tests and publish results
+ *  5. Package           — Build the runnable JAR artifact
+ *  6. Docker Build      — Package JAR into a Docker image
+ *  7. SonarQube         — Static analysis: bugs, smells, coverage
+ *  8. Trivy Scan        — Scan Docker image for CVEs (DevSecOps gate)
+ *  9. Deploy to K8s     — Roll out the image to Kubernetes
  * ══════════════════════════════════════════════════════════════════
  */
 
@@ -141,7 +142,41 @@ pipeline {
         }
 
         // ─────────────────────────────────────────────────────────
-        // STAGE 7 — TRIVY SECURITY SCAN  (DevSecOps Gate)
+        // STAGE 7 — SONARQUBE ANALYSIS  (Code Quality Gate)
+        // SonarQube performs static code analysis — it reads your
+        // source code without running it and detects:
+        //   • Bugs        — code that will likely fail at runtime
+        //   • Code Smells — maintainability issues (too complex,
+        //                   duplicated code, poor naming, etc.)
+        //   • Security Hotspots — places that need human review
+        //   • Coverage    — which lines are covered by unit tests
+        //
+        // The result appears as a "Quality Gate" — PASSED or FAILED.
+        // A failed Quality Gate can block deployment.
+        //
+        // PREREQUISITE:
+        //   1. SonarQube running at http://sonarqube:9000
+        //   2. Token added as Jenkins secret: ID = sonarqube-token
+        //   3. SonarQube Scanner plugin installed in Jenkins
+        // ─────────────────────────────────────────────────────────
+        stage('SonarQube Analysis') {
+            environment {
+                SONAR_TOKEN = credentials('sonarqube-token')
+            }
+            steps {
+                sh """
+                    mvn sonar:sonar \
+                        -Dsonar.projectKey=devops-workshop-app \
+                        -Dsonar.projectName='DevOps Workshop App' \
+                        -Dsonar.host.url=http://sonarqube:9000 \
+                        -Dsonar.token=\$SONAR_TOKEN
+                """
+                echo 'SonarQube analysis complete — check http://localhost:9000'
+            }
+        }
+
+        // ─────────────────────────────────────────────────────────
+        // STAGE 8 — TRIVY SECURITY SCAN  (DevSecOps Gate)
         // Trivy (by Aqua Security) scans the Docker image for CVEs
         // (Common Vulnerabilities and Exposures). It checks every
         // OS package and library layer against multiple vulnerability
