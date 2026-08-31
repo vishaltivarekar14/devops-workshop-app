@@ -165,7 +165,7 @@ pipeline {
             }
             steps {
                 sh """
-                    mvn sonar:sonar \
+                    mvn org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                         -Dsonar.projectKey=devops-workshop-app \
                         -Dsonar.projectName='DevOps Workshop App' \
                         -Dsonar.host.url=http://sonarqube:9000 \
