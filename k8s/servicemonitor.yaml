@@ -1,0 +1,33 @@
+# ──────────────────────────────────────────────────────────────────
+# WHAT IS A SERVICEMONITOR?
+#
+# A ServiceMonitor is a Kubernetes custom resource (added by the
+# Prometheus Operator) that tells Prometheus WHICH services to scrape
+# and HOW. Without this, Prometheus doesn't know your app exists.
+#
+# This file tells Prometheus:
+#   "Find the service labeled app=devops-workshop-app,
+#    and scrape the /actuator/prometheus endpoint on port 8080
+#    every 15 seconds."
+#
+# Prometheus will then store those metrics, and Grafana will
+# query Prometheus to build the dashboards you see.
+# ──────────────────────────────────────────────────────────────────
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: devops-workshop-app
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  selector:
+    matchLabels:
+      app: devops-workshop-app
+  namespaceSelector:
+    matchNames:
+      - default
+  endpoints:
+    - port: http
+      path: /actuator/prometheus
+      interval: 15s
