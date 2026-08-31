@@ -1,3 +1,43 @@
+# ──────────────────────────────────────────────────────────────────
+# WHAT IS A KUBERNETES DEPLOYMENT?
+#
+# A Deployment is a Kubernetes object that manages a set of identical
+# Pods running your application. It ensures:
+#   • The desired number of replicas (copies) are always running
+#   • If a Pod crashes, a new one is started automatically (self-healing)
+#   • New versions are rolled out gradually (rolling update)
+#   • You can roll back to a previous version if something goes wrong
+#
+# KEY CONCEPTS IN THIS FILE:
+#
+# replicas: 1
+#   → Run 1 copy of the app. In production you'd run 3+ for high availability.
+#
+# selector.matchLabels / template.metadata.labels
+#   → Labels are key-value tags on Kubernetes objects. The selector tells
+#     the Deployment which Pods belong to it (Pods with app=devops-workshop-app).
+#
+# imagePullPolicy: Never
+#   → Don't try to pull this image from a registry. Use only what is
+#     already loaded into the local k3s node. Required for local demos.
+#
+# livenessProbe
+#   → Kubernetes checks /actuator/health every 10 seconds. If the app
+#     stops responding, Kubernetes RESTARTS the Pod automatically.
+#
+# readinessProbe
+#   → Kubernetes checks /actuator/health before sending traffic. The Pod
+#     only receives requests AFTER this probe passes. Prevents routing
+#     traffic to a Pod that is still starting up.
+#
+# resources.requests
+#   → The minimum CPU/memory Kubernetes guarantees for this Pod.
+#     Used by the scheduler to decide which node to place the Pod on.
+#
+# resources.limits
+#   → The maximum CPU/memory this Pod can use. If it exceeds the memory
+#     limit it is OOMKilled (Out Of Memory killed) and restarted.
+# ──────────────────────────────────────────────────────────────────
 apiVersion: apps/v1
 kind: Deployment
 metadata:

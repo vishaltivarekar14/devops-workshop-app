@@ -1,3 +1,25 @@
+# ──────────────────────────────────────────────────────────────────
+# WHAT IS A KUBERNETES SERVICE?
+#
+# A Service gives your Pods a stable network address. Pods are
+# ephemeral — they can be created, destroyed, or rescheduled at any
+# time, and each gets a new IP when it restarts. A Service acts as
+# a stable "front door" that always routes traffic to the healthy
+# Pods, regardless of their current IPs.
+#
+# SERVICE TYPES:
+#   ClusterIP   — Internal only. Reachable only from inside the cluster.
+#   NodePort    — Opens a port on every node. Reachable from outside
+#                 the cluster via <node-ip>:<nodePort>. Good for demos.
+#   LoadBalancer— Provisions a cloud load balancer (AWS/GCP/Azure).
+#
+# We use NodePort here so you can open the app in a browser during
+# the workshop without needing an Ingress controller.
+#
+# ACCESS THE APP:
+#   http://localhost:30080/api/hello
+#   http://localhost:30080/actuator/health
+# ──────────────────────────────────────────────────────────────────
 apiVersion: v1
 kind: Service
 metadata:
@@ -5,10 +27,11 @@ metadata:
   labels:
     app: devops-workshop-app
 spec:
-  type: ClusterIP
+  type: NodePort
   selector:
     app: devops-workshop-app
   ports:
     - protocol: TCP
       port: 80
       targetPort: 8080
+      nodePort: 30080
